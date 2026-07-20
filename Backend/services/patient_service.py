@@ -94,3 +94,41 @@ def get_patient_by_id(patient_id):
         "emergency_contact": patient.emergency_contact,
         "medical_history": patient.medical_history
     }
+
+def update_patient(patient_id, data):
+
+    patient = Patient.query.get(patient_id)
+
+    if not patient:
+        return None, "Patient not found"
+
+    patient.age = data.get("age", patient.age)
+    patient.gender = data.get("gender", patient.gender)
+    patient.phone = data.get("phone", patient.phone)
+    patient.blood_group = data.get("blood_group", patient.blood_group)
+    patient.date_of_birth = data.get("date_of_birth", patient.date_of_birth)
+    patient.address = data.get("address", patient.address)
+    patient.emergency_contact = data.get(
+        "emergency_contact",
+        patient.emergency_contact
+    )
+    patient.medical_history = data.get(
+        "medical_history",
+        patient.medical_history
+    )
+
+    db.session.commit()
+
+    return patient, None
+
+def delete_patient(patient_id):
+
+    patient = Patient.query.get(patient_id)
+
+    if not patient:
+        return "Patient not found"
+
+    db.session.delete(patient)
+    db.session.commit()
+
+    return None

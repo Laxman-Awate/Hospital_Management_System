@@ -7,7 +7,9 @@ from flask import request
 from services.patient_service import (
     create_patient,
     get_all_patients,
-    get_patient_by_id
+    get_patient_by_id,
+    update_patient,
+    delete_patient
 )
 
 @role_required("Admin")
@@ -73,3 +75,27 @@ def get_patient(patient_id):
         "Patient fetched successfully",
         patient
     )
+
+@role_required("Admin")
+def edit_patient(patient_id):
+
+    data = request.get_json()
+
+    patient, error = update_patient(patient_id, data)
+
+    if error:
+        return error_response(error, 404)
+
+    return success_response(
+        "Patient updated successfully"
+    )
+
+@role_required("Admin")
+def remove_patient(patient_id):
+
+    error = delete_patient(patient_id)
+
+    if error:
+        return error_response(error, 404)
+
+    return success_response("Patient deleted successfully")

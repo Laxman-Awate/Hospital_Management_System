@@ -31,3 +31,10 @@ class User(db.Model):
     uselist=False,
     cascade="all, delete"
     )
+
+    doctor = db.relationship(
+    "Doctor",
+    backref="user",
+    uselist=False,
+    cascade="all, delete"
+)
