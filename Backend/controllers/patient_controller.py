@@ -2,7 +2,13 @@ from flask import request
 from services.patient_service import create_patient
 from utils.response import success_response, error_response
 from utils.role_required import role_required
-
+from services.patient_service import create_patient, get_all_patients
+from flask import request
+from services.patient_service import (
+    create_patient,
+    get_all_patients,
+    get_patient_by_id
+)
 
 @role_required("Admin")
 def add_patient():
@@ -37,4 +43,33 @@ def add_patient():
         "Patient created successfully",
         patient_data,
         201
+    )
+
+
+
+
+@role_required("Admin")
+def get_patients():
+
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 10, type=int)
+
+    data = get_all_patients(page, per_page)
+
+    return success_response(
+        "Patients fetched successfully",
+        data
+    )
+
+@role_required("Admin")
+def get_patient(patient_id):
+
+    patient = get_patient_by_id(patient_id)
+
+    if not patient:
+        return error_response("Patient not found", 404)
+
+    return success_response(
+        "Patient fetched successfully",
+        patient
     )
