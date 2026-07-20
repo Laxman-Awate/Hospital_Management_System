@@ -24,3 +24,10 @@ class User(db.Model):
         db.DateTime,
         default=datetime.utcnow
     )
+
+    patient = db.relationship(
+    "Patient",
+    backref="user",
+    uselist=False,
+    cascade="all, delete"
+    )
