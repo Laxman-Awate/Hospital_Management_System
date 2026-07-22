@@ -13,6 +13,12 @@ class Doctor(db.Model):
         unique=True,
         nullable=False
     )
+    appointments = db.relationship(
+        "Appointment",
+        backref="doctor",
+        lazy=True,
+        cascade="all, delete"
+    )
 
     specialization = db.Column(db.String(100), nullable=False)
 

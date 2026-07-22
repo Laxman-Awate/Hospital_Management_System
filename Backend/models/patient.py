@@ -13,6 +13,18 @@ class Patient(db.Model):
         nullable=False,
         unique=True
     )
+    appointments = db.relationship(
+        "Appointment",
+        backref="patient",
+        lazy=True,
+        cascade="all, delete"
+    )
+    notifications = db.relationship(
+        "Notification",
+        backref="patient",
+        lazy=True,
+        cascade="all, delete"
+    )
 
     age = db.Column(db.Integer, nullable=False)
 
