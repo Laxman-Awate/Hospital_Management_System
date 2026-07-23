@@ -31,8 +31,8 @@ from scheduler.scheduler import start_scheduler
 app = Flask(__name__)
 app.config.from_object(Config)
 
-# Initialize extensions
-CORS(app)
+# Initialize extensions with CORS allowing all origins
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 jwt = JWTManager(app)
 bcrypt = Bcrypt(app)
 db.init_app(app)
@@ -64,4 +64,4 @@ def home():
 
 if __name__ == "__main__":
     start_scheduler()
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0", port=5000)

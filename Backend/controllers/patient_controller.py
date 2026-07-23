@@ -1,9 +1,4 @@
 from flask import request
-from services.patient_service import create_patient
-from utils.response import success_response, error_response
-from utils.role_required import role_required
-from services.patient_service import create_patient, get_all_patients
-from flask import request
 from services.patient_service import (
     create_patient,
     get_all_patients,
@@ -11,10 +6,12 @@ from services.patient_service import (
     update_patient,
     delete_patient
 )
+from utils.response import success_response, error_response
+from utils.role_required import role_required
+
 
 @role_required("Admin")
 def add_patient():
-
     data = request.get_json()
 
     required_fields = [
@@ -31,7 +28,7 @@ def add_patient():
     patient, error = create_patient(data)
 
     if error:
-     return error_response(error, 400)
+        return error_response(error, 400)
 
     patient_data = {
         "id": patient.id,
@@ -48,11 +45,8 @@ def add_patient():
     )
 
 
-
-
 @role_required("Admin")
 def get_patients():
-
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
 
@@ -63,9 +57,9 @@ def get_patients():
         data
     )
 
+
 @role_required("Admin")
 def get_patient(patient_id):
-
     patient = get_patient_by_id(patient_id)
 
     if not patient:
@@ -76,9 +70,9 @@ def get_patient(patient_id):
         patient
     )
 
+
 @role_required("Admin")
 def edit_patient(patient_id):
-
     data = request.get_json()
 
     patient, error = update_patient(patient_id, data)
@@ -90,9 +84,9 @@ def edit_patient(patient_id):
         "Patient updated successfully"
     )
 
+
 @role_required("Admin")
 def remove_patient(patient_id):
-
     error = delete_patient(patient_id)
 
     if error:

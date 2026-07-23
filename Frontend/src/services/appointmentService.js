@@ -1,21 +1,26 @@
 import api from "./api";
 
 export const getAppointments = async () => {
-  const response = await api.get("/appointments");
+  const response = await api.get("/appointment");
   return response.data;
 };
 
-export const bookAppointment = async (data) => {
-  const response = await api.post("/appointments", data);
+export const getAppointmentById = async (id) => {
+  const response = await api.get(`/appointment/${id}`);
+  return response.data;
+};
+
+export const createAppointment = async (data) => {
+  const response = await api.post("/appointment", data);
   return response.data;
 };
 
 export const updateAppointment = async (id, data) => {
-  const response = await api.put(`/appointments/${id}`, data);
+  const response = await api.put(`/appointment/${id}`, data);
   return response.data;
 };
 
-export const cancelAppointment = async (id) => {
-  const response = await api.delete(`/appointments/${id}`);
+export const deleteAppointment = async (id) => {
+  const response = await api.delete(`/appointment/${id}`);
   return response.data;
 };

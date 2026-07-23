@@ -1,10 +1,46 @@
 from flask import Blueprint
-from controllers.doctor_controller import doctor_dashboard,add_doctor,get_doctor,edit_doctor,remove_doctor
+from flask_jwt_extended import jwt_required
 
-doctor_bp = Blueprint("doctor", __name__, url_prefix="/api/doctor")
+from controllers.doctor_controller import DoctorController
 
-doctor_bp.route("/dashboard", methods=["GET"])(doctor_dashboard)
-doctor_bp.route("", methods=["POST"])(add_doctor)
-doctor_bp.route("/<int:doctor_id>",methods=["GET"])(get_doctor)
-doctor_bp.route("/<int:doctor_id>",methods=["PUT"])(edit_doctor)
-doctor_bp.route("/<int:doctor_id>",methods=["DELETE"])(remove_doctor)
+doctor_bp = Blueprint(
+    "doctor",
+    __name__,
+    url_prefix="/api/doctor"
+)
+
+
+@doctor_bp.route("/dashboard", methods=["GET"])
+@jwt_required()
+def doctor_dashboard():
+    return DoctorController.doctor_dashboard()
+
+
+@doctor_bp.route("", methods=["GET"])
+@jwt_required()
+def get_doctors():
+    return DoctorController.get_doctors()
+
+
+@doctor_bp.route("", methods=["POST"])
+@jwt_required()
+def create_doctor():
+    return DoctorController.create_doctor()
+
+
+@doctor_bp.route("/<int:doctor_id>", methods=["GET"])
+@jwt_required()
+def get_doctor(doctor_id):
+    return DoctorController.get_doctor(doctor_id)
+
+
+@doctor_bp.route("/<int:doctor_id>", methods=["PUT"])
+@jwt_required()
+def update_doctor(doctor_id):
+    return DoctorController.update_doctor(doctor_id)
+
+
+@doctor_bp.route("/<int:doctor_id>", methods=["DELETE"])
+@jwt_required()
+def delete_doctor(doctor_id):
+    return DoctorController.delete_doctor(doctor_id)
