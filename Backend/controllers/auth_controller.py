@@ -16,11 +16,20 @@ def register():
     full_name = data.get("full_name")
     email = data.get("email")
     password = data.get("password")
-    role = data.get("role")
+    # The database and authorization checks use title-cased role values
+    # ("Admin", "Doctor", "Patient").  The registration form previously
+    # posted lowercase values, which produced accounts that could not be used
+    # to create a patient profile.
+    role = (data.get("role") or "").strip().capitalize()
 
     if not all([full_name, email, password, role]):
         return jsonify({
             "message": "All fields are required"
+        }), 400
+
+    if role not in {"Admin", "Doctor", "Patient"}:
+        return jsonify({
+            "message": "Role must be Admin, Doctor, or Patient"
         }), 400
 
     existing_user = User.query.filter_by(email=email).first()

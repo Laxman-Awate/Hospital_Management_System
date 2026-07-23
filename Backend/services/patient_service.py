@@ -1,45 +1,62 @@
 from models import db
 from models.patient import Patient
 from models.user import User
-from models.patient import Patient
+from extensions import bcrypt
 
 
 def create_patient(data):
+    try:
+        user_id = data.get("user_id")
 
-    # Check if user exists
-    user = User.query.get(data["user_id"])
+        if user_id:
+            # Backward compatible path for an already registered patient.
+            user = db.session.get(User, int(user_id))
 
-    if not user:
-        return None, "User not found"
+            if not user:
+                return None, "User not found"
 
-    # Check user role
-    if user.role != "Patient":
-        return None, "Selected user is not a Patient"
+            if (user.role or "").casefold() != "patient":
+                return None, "Selected user is not a Patient"
 
-    # Check duplicate patient profile
-    existing_patient = Patient.query.filter_by(
-        user_id=data["user_id"]
-    ).first()
+            existing_patient = Patient.query.filter_by(user_id=user.id).first()
 
-    if existing_patient:
-        return None, "Patient profile already exists"
+            if existing_patient:
+                return None, "Patient profile already exists"
+        else:
+            if User.query.filter_by(email=data["email"]).first():
+                return None, "Email already exists"
 
-    patient = Patient(
-        user_id=data["user_id"],
-        age=data["age"],
-        gender=data["gender"],
-        phone=data["phone"],
-        blood_group=data.get("blood_group"),
-        date_of_birth=data.get("date_of_birth"),
-        address=data.get("address"),
-        emergency_contact=data.get("emergency_contact"),
-        medical_history=data.get("medical_history")
-    )
+            user = User(
+                full_name=data["full_name"],
+                email=data["email"],
+                password=bcrypt.generate_password_hash(data["password"]).decode("utf-8"),
+                role="Patient"
+            )
+            db.session.add(user)
+            db.session.flush()
 
-    db.session.add(patient)
-    db.session.commit()
+        patient = Patient(
+            user_id=user.id,
+            age=data["age"],
+            gender=data["gender"],
+            phone=data["phone"],
+            blood_group=data.get("blood_group"),
+            date_of_birth=data.get("date_of_birth"),
+            address=data.get("address"),
+            emergency_contact=data.get("emergency_contact"),
+            medical_history=data.get("medical_history")
+        )
 
-    return patient, None
+        db.session.add(patient)
+        db.session.commit()
+
+        return patient, None
+    except (TypeError, ValueError):
+        db.session.rollback()
+        return None, "User ID must be a valid number"
+    except Exception as error:
+        db.session.rollback()
+        return None, str(error)
 
 
 

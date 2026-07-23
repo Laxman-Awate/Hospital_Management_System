@@ -12,7 +12,9 @@ function AddEditPatientModal({
   patient,
 }) {
   const initialState = {
-    user_id: "",
+    full_name: "",
+    email: "",
+    password: "",
     age: "",
     gender: "",
     phone: "",
@@ -29,7 +31,9 @@ function AddEditPatientModal({
   useEffect(() => {
     if (patient) {
       setFormData({
-        user_id: patient.user_id || "",
+        full_name: patient.full_name || "",
+        email: patient.email || "",
+        password: "",
         age: patient.age || "",
         gender: patient.gender || "",
         phone: patient.phone || "",
@@ -113,15 +117,37 @@ function AddEditPatientModal({
         >
 
           <input
-            type="number"
-            name="user_id"
-            placeholder="User ID"
-            value={formData.user_id}
+            name="full_name"
+            placeholder="Full Name"
+            value={formData.full_name}
             onChange={handleChange}
             disabled={patient}
             required
             className="border rounded-lg p-3"
           />
+
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={handleChange}
+            disabled={patient}
+            required
+            className="border rounded-lg p-3"
+          />
+
+          {!patient && (
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              className="border rounded-lg p-3"
+            />
+          )}
 
           <input
             type="number"

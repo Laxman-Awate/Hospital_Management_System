@@ -9,7 +9,7 @@ function Register() {
     full_name: "",
     email: "",
     password: "",
-    role: "patient",
+    role: "Patient",
   });
 
   const [loading, setLoading] = useState(false);
@@ -91,9 +91,9 @@ function Register() {
             className="w-full border p-3 rounded mb-4"
             onChange={handleChange}
           >
-            <option value="patient">Patient</option>
-            <option value="doctor">Doctor</option>
-            <option value="admin">Admin</option>
+            <option value="Patient">Patient</option>
+            <option value="Doctor">Doctor</option>
+            <option value="Admin">Admin</option>
           </select>
 
           <button

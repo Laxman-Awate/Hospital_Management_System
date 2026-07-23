@@ -14,17 +14,29 @@ function Doctors() {
   const [selectedDoctor, setSelectedDoctor] = useState(null);
 
   const fetchDoctors = async () => {
-    try {
-      setLoading(true);
-      const response = await getDoctors();
-      setDoctors(response.data.doctors || []);
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to load doctors.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    setLoading(true);
+
+    const response = await getDoctors();
+
+    console.log("Doctors API Response:", response);
+
+    const doctorsData =
+      response?.data?.data ||
+      response?.data?.doctors ||
+      response?.data ||
+      [];
+
+    setDoctors(Array.isArray(doctorsData) ? doctorsData : []);
+
+    setCurrentPage(1);
+  } catch (error) {
+    console.error(error);
+    toast.error("Failed to load doctors.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchDoctors();
@@ -96,8 +108,14 @@ function Doctors() {
         <div className="bg-white rounded-xl shadow p-5">
           <h3 className="text-gray-500 text-sm">Available Now</h3>
           <p className="text-3xl font-bold text-orange-600">
-            {doctors.filter(d => d.availability).length}
-          </p>
+              {
+                doctors.filter(
+                  doctor =>
+                    doctor.available_days &&
+                    doctor.available_time
+                ).length
+              }
+            </p>
         </div>
       </div>
 
@@ -164,7 +182,10 @@ function Doctors() {
                         onClick={async () => {
                           try {
                             const response = await getDoctorById(doctor.id);
-                            setSelectedDoctor(response.data);
+
+                            setSelectedDoctor(
+                              response.data.data || response.data
+                            );
                             setIsModalOpen(true);
                           } catch (error) {
                             console.error(error);

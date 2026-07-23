@@ -12,18 +12,25 @@ from utils.role_required import role_required
 
 @role_required("Admin")
 def add_patient():
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
 
     required_fields = [
-        "user_id",
         "age",
         "gender",
         "phone"
     ]
 
     for field in required_fields:
-        if field not in data:
+        if not data.get(field):
             return error_response(f"{field} is required", 400)
+
+    # An administrator can now create the patient's account and profile in a
+    # single action.  Keep user_id support for any existing integrations that
+    # intentionally attach a profile to an already registered patient.
+    if not data.get("user_id"):
+        for field in ["full_name", "email", "password"]:
+            if not data.get(field):
+                return error_response(f"{field} is required", 400)
 
     patient, error = create_patient(data)
 
@@ -33,6 +40,8 @@ def add_patient():
     patient_data = {
         "id": patient.id,
         "user_id": patient.user_id,
+        "full_name": patient.user.full_name,
+        "email": patient.user.email,
         "age": patient.age,
         "gender": patient.gender,
         "phone": patient.phone
