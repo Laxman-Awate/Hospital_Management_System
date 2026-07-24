@@ -3,6 +3,7 @@ import MainLayout from "../layouts/MainLayout";
 import DashboardCard from "../components/DashboardCard";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
+import { Calendar, ClipboardList, CheckCircle, FileText, CheckSquare, Clock, DollarSign, UserCircle } from "lucide-react";
 
 function PatientDashboard() {
   const { user } = useAuth();
@@ -62,12 +63,15 @@ function PatientDashboard() {
 
   return (
     <MainLayout>
-      <h1 className="text-3xl font-bold mb-6">
-        Welcome, {user?.full_name || "Patient"}
-      </h1>
+      <div className="mb-8">
+          <h1 className="text-3xl font-bold text-slate-800">
+            Welcome, {user?.full_name || "Patient"}
+          </h1>
+          <p className="text-slate-500 mt-1">Here is a summary of your medical profile and bills.</p>
+      </div>
 
       {loading ? (
-        <div className="flex justify-center items-center py-12">
+        <div className="flex justify-center items-center py-20">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
         </div>
       ) : (
@@ -76,26 +80,26 @@ function PatientDashboard() {
             <DashboardCard
               title="Total Appointments"
               value={stats.appointments}
-              icon="📅"
+              icon={Calendar}
               color="blue"
             />
             <DashboardCard
               title="Scheduled"
               value={stats.scheduledAppointments}
-              icon="📋"
-              color="green"
+              icon={ClipboardList}
+              color="emerald"
             />
             <DashboardCard
               title="Completed"
               value={stats.completedAppointments}
-              icon="✅"
-              color="purple"
+              icon={CheckCircle}
+              color="teal"
             />
             <DashboardCard
               title="Total Bills"
               value={stats.totalBills}
-              icon="📄"
-              color="orange"
+              icon={FileText}
+              color="amber"
             />
           </div>
 
@@ -103,25 +107,25 @@ function PatientDashboard() {
             <DashboardCard
               title="Paid Bills"
               value={stats.paidBills}
-              icon="💵"
-              color="green"
+              icon={CheckSquare}
+              color="emerald"
             />
             <DashboardCard
               title="Pending Bills"
               value={stats.pendingBills}
-              icon="⏳"
-              color="yellow"
+              icon={Clock}
+              color="amber"
             />
             <DashboardCard
               title="Total Amount"
               value={`$${stats.totalAmount.toFixed(2)}`}
-              icon="💰"
+              icon={DollarSign}
               color="blue"
             />
             <DashboardCard
               title="Patient ID"
               value={user?.id || "N/A"}
-              icon="🆔"
+              icon={UserCircle}
               color="gray"
             />
           </div>

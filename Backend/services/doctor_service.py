@@ -6,8 +6,22 @@ from flask_bcrypt import Bcrypt
 bcrypt = Bcrypt()
 
 
-def get_doctors():
+def get_doctors(role="Admin"):
     doctors = Doctor.query.all()
+
+    if role == "Patient":
+        return [
+            {
+                "id": doctor.id,
+                "full_name": doctor.user.full_name,
+                "specialization": doctor.specialization,
+                "qualification": doctor.qualification,
+                "experience": doctor.experience,
+                "available_days": doctor.available_days,
+                "available_time": doctor.available_time,
+            }
+            for doctor in doctors if doctor.status
+        ]
 
     return [
         {

@@ -3,44 +3,34 @@ import MainLayout from "../layouts/MainLayout";
 import { getDoctors, getDoctorById, deleteDoctor } from "../services/doctorService";
 import AddEditDoctorModal from "../components/AddEditDoctorModal";
 import { toast } from "react-toastify";
+import Table from "../components/Table";
+import { Users, Stethoscope, Star, Clock, Search, Plus, Edit2, Trash2 } from "lucide-react";
 
 function Doctors() {
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const doctorsPerPage = 5;
+  const doctorsPerPage = 8;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
 
   const fetchDoctors = async () => {
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
+      const response = await getDoctors();
+      const doctorsData = response?.data?.data || response?.data?.doctors || response?.data || [];
+      setDoctors(Array.isArray(doctorsData) ? doctorsData : []);
+      setCurrentPage(1);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to load doctors.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const response = await getDoctors();
-
-    console.log("Doctors API Response:", response);
-
-    const doctorsData =
-      response?.data?.data ||
-      response?.data?.doctors ||
-      response?.data ||
-      [];
-
-    setDoctors(Array.isArray(doctorsData) ? doctorsData : []);
-
-    setCurrentPage(1);
-  } catch (error) {
-    console.error(error);
-    toast.error("Failed to load doctors.");
-  } finally {
-    setLoading(false);
-  }
-};
-
-  useEffect(() => {
-    fetchDoctors();
-  }, []);
+  useEffect(() => { fetchDoctors(); }, []);
 
   const filteredDoctors = useMemo(() => {
     return doctors.filter((doctor) => {
@@ -60,11 +50,7 @@ function Doctors() {
   const totalPages = Math.ceil(filteredDoctors.length / doctorsPerPage);
 
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this doctor?"
-    );
-    if (!confirmDelete) return;
-
+    if (!window.confirm("Are you sure you want to delete this doctor?")) return;
     try {
       await deleteDoctor(id);
       toast.success("Doctor deleted successfully.");
@@ -75,180 +61,111 @@ function Doctors() {
     }
   };
 
+  const columns = [
+    { header: "Name", render: (row) => (
+      <div className="flex items-center">
+        <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold text-sm mr-3">
+          {row.full_name?.charAt(0) || "D"}
+        </div>
+        <div>
+          <p className="font-medium text-slate-900">Dr. {row.full_name}</p>
+          <p className="text-xs text-slate-400">{row.email}</p>
+        </div>
+      </div>
+    )},
+    { header: "Specialization", accessor: "specialization" },
+    { header: "Qualification", accessor: "qualification" },
+    { header: "Phone", accessor: "phone" },
+    { header: "Experience", render: (row) => `${row.experience || 0} yrs` },
+    { header: "Available Days", render: (row) => <span className="text-xs text-slate-600">{row.available_days || "—"}</span> },
+    { header: "Actions", render: (row) => (
+      <div className="flex gap-2">
+        <button
+          onClick={async () => {
+            try {
+              const response = await getDoctorById(row.id);
+              setSelectedDoctor(response.data.data || response.data);
+              setIsModalOpen(true);
+            } catch { toast.error("Failed to load doctor details."); }
+          }}
+          className="p-1.5 text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors"
+          title="Edit"
+        >
+          <Edit2 className="w-4 h-4" />
+        </button>
+        <button
+          onClick={() => handleDelete(row.id)}
+          className="p-1.5 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+          title="Delete"
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
+      </div>
+    )},
+  ];
+
   return (
     <MainLayout>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Doctors</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-800">Doctors</h1>
+          <p className="text-slate-500 text-sm mt-1">Manage all registered doctors</p>
+        </div>
         <button
-          onClick={() => {
-            setSelectedDoctor(null);
-            setIsModalOpen(true);
-          }}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg"
+          onClick={() => { setSelectedDoctor(null); setIsModalOpen(true); }}
+          className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-medium transition-colors shadow-sm shadow-blue-200"
         >
-          + Add Doctor
+          <Plus className="w-5 h-5 mr-2" /> Add Doctor
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-xl shadow p-5">
-          <h3 className="text-gray-500 text-sm">Total Doctors</h3>
-          <p className="text-3xl font-bold text-blue-600">{doctors.length}</p>
-        </div>
-        <div className="bg-white rounded-xl shadow p-5">
-          <h3 className="text-gray-500 text-sm">Active Doctors</h3>
-          <p className="text-3xl font-bold text-green-600">{filteredDoctors.length}</p>
-        </div>
-        <div className="bg-white rounded-xl shadow p-5">
-          <h3 className="text-gray-500 text-sm">Specializations</h3>
-          <p className="text-3xl font-bold text-purple-600">
-            {new Set(doctors.map(d => d.specialization)).size}
-          </p>
-        </div>
-        <div className="bg-white rounded-xl shadow p-5">
-          <h3 className="text-gray-500 text-sm">Available Now</h3>
-          <p className="text-3xl font-bold text-orange-600">
-              {
-                doctors.filter(
-                  doctor =>
-                    doctor.available_days &&
-                    doctor.available_time
-                ).length
-              }
-            </p>
-        </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {[
+          { label: "Total Doctors", value: doctors.length, icon: Users, color: "bg-blue-50 text-blue-600" },
+          { label: "Active Doctors", value: filteredDoctors.length, icon: Stethoscope, color: "bg-emerald-50 text-emerald-600" },
+          { label: "Specializations", value: new Set(doctors.map(d => d.specialization)).size, icon: Star, color: "bg-purple-50 text-purple-600" },
+          { label: "Available Now", value: doctors.filter(d => d.available_days && d.available_time).length, icon: Clock, color: "bg-amber-50 text-amber-600" },
+        ].map((stat) => (
+          <div key={stat.label} className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">{stat.label}</p>
+                <p className="text-3xl font-bold text-slate-800 mt-1">{stat.value}</p>
+              </div>
+              <div className={`p-3 rounded-xl ${stat.color}`}><stat.icon className="w-5 h-5" /></div>
+            </div>
+          </div>
+        ))}
       </div>
 
-      <div className="mb-6">
+      <div className="mb-6 relative">
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
         <input
           type="text"
           placeholder="Search by name, email, specialization..."
           value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setCurrentPage(1);
-          }}
-          className="border rounded-lg px-4 py-2 w-full md:w-96"
+          onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
+          className="pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl w-full md:w-96 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm transition-colors"
         />
       </div>
 
       {loading ? (
-        <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        </div>
+        <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" /></div>
       ) : (
-        <div className="overflow-x-auto bg-white shadow rounded-lg">
-          <table className="w-full">
-            <thead className="bg-blue-600 text-white">
-              <tr>
-                <th className="p-3">ID</th>
-                <th className="p-3">Name</th>
-                <th className="p-3">Email</th>
-                <th className="p-3">Specialization</th>
-                <th className="p-3">Phone</th>
-                <th className="p-3">Qualification</th>
-                <th className="p-3">Experience</th>
-                <th className="p-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentDoctors.length === 0 ? (
-                <tr>
-                  <td colSpan="8" className="text-center py-12">
-                    <div className="flex flex-col items-center">
-                      <svg className="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                      </svg>
-                      <p className="text-gray-500 text-lg">No doctors found</p>
-                      <p className="text-gray-400 text-sm mt-1">Try adjusting your search or add a new doctor</p>
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                currentDoctors.map((doctor) => (
-                  <tr
-                    key={doctor.id}
-                    className="border-b hover:bg-gray-100"
-                  >
-                    <td className="p-3">{doctor.id}</td>
-                    <td className="p-3">{doctor.full_name}</td>
-                    <td className="p-3">{doctor.email}</td>
-                    <td className="p-3">{doctor.specialization}</td>
-                    <td className="p-3">{doctor.phone}</td>
-                    <td className="p-3">{doctor.qualification}</td>
-                    <td className="p-3">{doctor.experience} years</td>
-                    <td className="p-3 flex gap-2">
-                      <button
-                        onClick={async () => {
-                          try {
-                            const response = await getDoctorById(doctor.id);
-
-                            setSelectedDoctor(
-                              response.data.data || response.data
-                            );
-                            setIsModalOpen(true);
-                          } catch (error) {
-                            console.error(error);
-                            toast.error("Failed to load doctor details.");
-                          }
-                        }}
-                        className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(doctor.id)}
-                        className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <Table columns={columns} data={currentDoctors} keyField="id" emptyMessage="No doctors found. Add your first doctor to get started." />
       )}
 
       {totalPages > 1 && (
-        <div className="flex justify-center items-center mt-6 gap-2 flex-wrap">
-          <button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage(currentPage - 1)}
-            className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white px-4 py-2 rounded-lg disabled:opacity-50 transition-colors"
-          >
-            Previous
-          </button>
+        <div className="flex justify-center items-center mt-6 gap-2">
+          <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)} className="px-4 py-2 text-sm bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 disabled:opacity-40 transition-colors">Previous</button>
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <button
-              key={page}
-              onClick={() => setCurrentPage(page)}
-              className={`px-4 py-2 rounded-lg transition-colors ${
-                currentPage === page
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200 hover:bg-gray-300 text-gray-700"
-              }`}
-            >
-              {page}
-            </button>
+            <button key={page} onClick={() => setCurrentPage(page)} className={`px-4 py-2 text-sm rounded-lg transition-colors ${currentPage === page ? "bg-blue-600 text-white shadow-sm" : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"}`}>{page}</button>
           ))}
-          <button
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage(currentPage + 1)}
-            className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white px-4 py-2 rounded-lg disabled:opacity-50 transition-colors"
-          >
-            Next
-          </button>
+          <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)} className="px-4 py-2 text-sm bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 disabled:opacity-40 transition-colors">Next</button>
         </div>
       )}
 
-      <AddEditDoctorModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSuccess={fetchDoctors}
-        doctor={selectedDoctor}
-      />
+      <AddEditDoctorModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSuccess={fetchDoctors} doctor={selectedDoctor} />
     </MainLayout>
   );
 }

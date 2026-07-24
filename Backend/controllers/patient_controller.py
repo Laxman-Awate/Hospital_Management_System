@@ -54,12 +54,16 @@ def add_patient():
     )
 
 
-@role_required("Admin")
+@role_required(["Admin", "Doctor"])
 def get_patients():
+    from flask_jwt_extended import get_jwt, get_jwt_identity
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
 
-    data = get_all_patients(page, per_page)
+    role = get_jwt().get("role") if get_jwt() else "Admin"
+    user_id = get_jwt_identity()
+
+    data = get_all_patients(page, per_page, role, user_id)
 
     return success_response(
         "Patients fetched successfully",

@@ -59,7 +59,9 @@ class DoctorController:
 
     @staticmethod
     def get_doctors():
-        doctors = doctor_service.get_doctors()
+        from flask_jwt_extended import get_jwt
+        role = get_jwt().get("role") if get_jwt() else "Admin"
+        doctors = doctor_service.get_doctors(role)
 
         return success_response(
             "Doctors fetched successfully",

@@ -24,6 +24,7 @@ from routes.billing_routes import billing_bp
 from routes.notification_routes import notification_bp
 from routes.agent_routes import agent_bp
 from routes.prescription_routes import prescription_bp
+from routes.ai_routes import ai_bp
 
 from scheduler.scheduler import start_scheduler
 
@@ -49,6 +50,7 @@ app.register_blueprint(billing_bp)
 app.register_blueprint(notification_bp)
 app.register_blueprint(agent_bp)
 app.register_blueprint(prescription_bp)
+app.register_blueprint(ai_bp)
 
 # Create database tables
 with app.app_context():

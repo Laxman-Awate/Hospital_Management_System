@@ -1,6 +1,7 @@
 from flask import request
 from services.billing_service import BillingService
 from utils.response import success_response, error_response
+from utils.role_required import role_required
 
 
 class BillingController:
@@ -22,9 +23,13 @@ class BillingController:
         )
 
     @staticmethod
+    @role_required(["Admin", "Patient"])
     def get_all_bills():
+        from flask_jwt_extended import get_jwt, get_jwt_identity
+        role = get_jwt().get("role") if get_jwt() else "Admin"
+        user_id = get_jwt_identity()
 
-        bills = BillingService.get_all_bills()
+        bills = BillingService.get_all_bills(role, user_id)
 
         return success_response(
             "Bills fetched successfully",
@@ -32,9 +37,13 @@ class BillingController:
         )
 
     @staticmethod
+    @role_required(["Admin", "Patient"])
     def get_bill(bill_id):
+        from flask_jwt_extended import get_jwt, get_jwt_identity
+        role = get_jwt().get("role") if get_jwt() else "Admin"
+        user_id = get_jwt_identity()
 
-        bill = BillingService.get_bill_by_id(bill_id)
+        bill = BillingService.get_bill_by_id(bill_id, role, user_id)
 
         if not bill:
             return error_response(

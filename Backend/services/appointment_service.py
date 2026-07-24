@@ -15,12 +15,6 @@ from models.user import User
 def create_appointment(data):
     """
     Create a new appointment.
-    
-    Args:
-        data: Dictionary containing appointment details
-        
-    Returns:
-        Tuple of (appointment, error) where error is None on success
     """
     existing = Appointment.query.filter_by(
         doctor_id=data["doctor_id"],
@@ -55,15 +49,21 @@ def create_appointment(data):
     return appointment, None
 
 
-def get_all_appointments():
-    """
-    Get all appointments with related patient and doctor information.
+def get_all_appointments(role, user_id):
+    query = Appointment.query
     
-    Returns:
-        List of appointment dictionaries
-    """
-    appointments = Appointment.query.all()
+    if role == "Doctor":
+        doctor = Doctor.query.filter_by(user_id=int(user_id)).first()
+        if not doctor:
+            return []
+        query = query.filter_by(doctor_id=doctor.id)
+    elif role == "Patient":
+        patient = Patient.query.filter_by(user_id=int(user_id)).first()
+        if not patient:
+            return []
+        query = query.filter_by(patient_id=patient.id)
 
+    appointments = query.all()
     result = []
 
     for appointment in appointments:
@@ -80,20 +80,20 @@ def get_all_appointments():
     return result
 
 
-def get_appointment_by_id(appointment_id):
-    """
-    Get appointment by ID with related information.
-    
-    Args:
-        appointment_id: The appointment ID
-        
-    Returns:
-        Appointment dictionary or None if not found
-    """
+def get_appointment_by_id(appointment_id, role, user_id):
     appointment = Appointment.query.get(appointment_id)
 
     if not appointment:
         return None
+
+    if role == "Doctor":
+        doctor = Doctor.query.filter_by(user_id=int(user_id)).first()
+        if not doctor or appointment.doctor_id != doctor.id:
+            return None
+    elif role == "Patient":
+        patient = Patient.query.filter_by(user_id=int(user_id)).first()
+        if not patient or appointment.patient_id != patient.id:
+            return None
 
     return {
         "id": appointment.id,
@@ -106,21 +106,20 @@ def get_appointment_by_id(appointment_id):
     }
 
 
-def update_appointment_status(appointment_id, status):
-    """
-    Update appointment status.
-    
-    Args:
-        appointment_id: The appointment ID
-        status: New status value
-        
-    Returns:
-        Error message or None on success
-    """
+def update_appointment_status(appointment_id, status, role, user_id):
     appointment = Appointment.query.get(appointment_id)
 
     if not appointment:
         return "Appointment not found"
+
+    if role == "Doctor":
+        doctor = Doctor.query.filter_by(user_id=int(user_id)).first()
+        if not doctor or appointment.doctor_id != doctor.id:
+            return "Access denied"
+    elif role == "Patient":
+        patient = Patient.query.filter_by(user_id=int(user_id)).first()
+        if not patient or appointment.patient_id != patient.id:
+            return "Access denied"
 
     appointment.status = status
     db.session.commit()
@@ -128,20 +127,20 @@ def update_appointment_status(appointment_id, status):
     return None
 
 
-def delete_appointment(appointment_id):
-    """
-    Delete an appointment.
-    
-    Args:
-        appointment_id: The appointment ID
-        
-    Returns:
-        Error message or None on success
-    """
+def delete_appointment(appointment_id, role, user_id):
     appointment = Appointment.query.get(appointment_id)
 
     if not appointment:
         return "Appointment not found"
+
+    if role == "Doctor":
+        doctor = Doctor.query.filter_by(user_id=int(user_id)).first()
+        if not doctor or appointment.doctor_id != doctor.id:
+            return "Access denied"
+    elif role == "Patient":
+        patient = Patient.query.filter_by(user_id=int(user_id)).first()
+        if not patient or appointment.patient_id != patient.id:
+            return "Access denied"
 
     db.session.delete(appointment)
     db.session.commit()

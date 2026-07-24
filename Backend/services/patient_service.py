@@ -61,9 +61,21 @@ def create_patient(data):
 
 
 
-def get_all_patients(page=1, per_page=10):
+def get_all_patients(page=1, per_page=10, role="Admin", user_id=None):
+    from models.appointment import Appointment
+    from models.doctor import Doctor
+    
+    query = Patient.query
+    
+    if role == "Doctor":
+        doctor = Doctor.query.filter_by(user_id=int(user_id)).first()
+        if doctor:
+            patient_ids = [app.patient_id for app in Appointment.query.filter_by(doctor_id=doctor.id).all()]
+            query = query.filter(Patient.id.in_(patient_ids))
+        else:
+            query = query.filter(db.false())
 
-    patients = Patient.query.paginate(
+    patients = query.paginate(
         page=page,
         per_page=per_page,
         error_out=False

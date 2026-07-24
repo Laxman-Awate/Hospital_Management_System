@@ -1,28 +1,22 @@
 from flask import Blueprint
 
 from controllers.dashboard_controller import (
-    stats,
-    recent,
-    doctor_stats
+    monthly_appointments,
+    monthly_revenue,
+    patient_growth,
+    recent_appointments,
+    recent_notifications,
+    recent_prescriptions,
+    summary,
 )
 
-dashboard_bp = Blueprint(
-    "dashboard",
-    __name__,
-    url_prefix="/api/dashboard"
-)
 
-dashboard_bp.route(
-    "/stats",
-    methods=["GET"]
-)(stats)
+dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/api/dashboard")
 
-dashboard_bp.route(
-    "/recent-appointments",
-    methods=["GET"]
-)(recent)
-
-dashboard_bp.route(
-    "/doctor-summary",
-    methods=["GET"]
-)(doctor_stats)
+dashboard_bp.route("/summary", methods=["GET"])(summary)
+dashboard_bp.route("/monthly-revenue", methods=["GET"])(monthly_revenue)
+dashboard_bp.route("/monthly-appointments", methods=["GET"])(monthly_appointments)
+dashboard_bp.route("/patient-growth", methods=["GET"])(patient_growth)
+dashboard_bp.route("/recent-appointments", methods=["GET"])(recent_appointments)
+dashboard_bp.route("/recent-notifications", methods=["GET"])(recent_notifications)
+dashboard_bp.route("/recent-prescriptions", methods=["GET"])(recent_prescriptions)

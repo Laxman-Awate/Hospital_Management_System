@@ -57,21 +57,32 @@ class BillingService:
         return bill, None
 
     @staticmethod
-    def get_all_bills():
+    def get_all_bills(role="Admin", user_id=None):
+        query = Bill.query.order_by(Bill.created_at.desc())
+        
+        if role == "Patient":
+            from models.patient import Patient
+            patient = Patient.query.filter_by(user_id=int(user_id)).first()
+            if not patient:
+                return []
+            query = query.join(Appointment).filter(Appointment.patient_id == patient.id)
 
-        bills = Bill.query.order_by(
-            Bill.created_at.desc()
-        ).all()
-
+        bills = query.all()
         return [bill.to_dict() for bill in bills]
 
     @staticmethod
-    def get_bill_by_id(bill_id):
+    def get_bill_by_id(bill_id, role="Admin", user_id=None):
 
         bill = Bill.query.get(bill_id)
 
         if not bill:
             return None
+            
+        if role == "Patient":
+            from models.patient import Patient
+            patient = Patient.query.filter_by(user_id=int(user_id)).first()
+            if not patient or bill.appointment.patient_id != patient.id:
+                return None
 
         return bill.to_dict()
 
