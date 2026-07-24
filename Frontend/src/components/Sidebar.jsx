@@ -32,6 +32,10 @@ function Sidebar() {
                     Billing
                 </Link>
 
+                <Link className="px-6 py-3 hover:bg-blue-600" to="/prescriptions">
+                    Prescriptions
+                </Link>
+
                 <Link className="px-6 py-3 hover:bg-blue-600" to="/assistant">
                     AI Assistant
                 </Link>

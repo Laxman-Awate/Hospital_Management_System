@@ -6,3 +6,4 @@ from .doctor import Doctor
 from .appointment import Appointment
 from .bill import Bill
 from .notification import Notification
+from .prescription import Prescription

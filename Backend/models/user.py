@@ -26,15 +26,15 @@ class User(db.Model):
     )
 
     patient = db.relationship(
-    "Patient",
-    backref="user",
-    uselist=False,
-    cascade="all, delete"
+        "Patient",
+        backref="user",
+        uselist=False,
+        cascade="all, delete"
     )
 
     doctor = db.relationship(
-    "Doctor",
-    backref="user",
-    uselist=False,
-    cascade="all, delete"
-)
+        "Doctor",
+        backref="user",
+        uselist=False,
+        cascade="all, delete"
+    )

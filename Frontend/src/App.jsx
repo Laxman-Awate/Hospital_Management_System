@@ -12,6 +12,7 @@ import Doctors from "./pages/Doctors";
 import Appointments from "./pages/Appointments";
 import Billing from "./pages/Billing";
 import AppointmentAssistant from "./pages/AppointmentAssistant";
+import Prescriptions from "./pages/Prescriptions";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -61,6 +62,8 @@ function App() {
       <Route path="/appointments" element={<ProtectedRoute><Appointments /></ProtectedRoute>} />
 
       <Route path="/billing" element={<ProtectedRoute><Billing /></ProtectedRoute>} />
+
+      <Route path="/prescriptions" element={<ProtectedRoute><Prescriptions /></ProtectedRoute>} />
 
          <Route path="/assistant" element={<ProtectedRoute><AppointmentAssistant /></ProtectedRoute>} />
 
