@@ -13,71 +13,80 @@ from typing import Optional
 class AppointmentState:
     """
     State container for appointment booking conversation.
-    
-    This dataclass tracks all information collected during a conversation
-    and maintains the flow state for multi-turn interactions.
-    
-    Attributes:
-        intent: The user's intent (e.g., "book", "cancel", "reschedule")
-        patient_id: The patient's ID number
-        doctor_name: Name of the doctor
-        appointment_date: Date for the appointment (string before normalization)
-        appointment_time: Time for the appointment (string before normalization)
-        reason: Reason for the appointment
-        completed: Whether the appointment booking is complete
-        waiting_for: Which field the agent is currently waiting for
     """
+
     intent: str = ""
+
     patient_id: Optional[int] = None
+
+    # Patient symptoms
+    symptoms: str = ""
+
+    # Recommended department
+    department: str = ""
+
+    # Selected doctor
     doctor_name: str = ""
+
+    # Department recommended by AI
+    recommended_department: str = ""
+
+    # Available doctors for selected department
+    doctor_list: list = field(default_factory=list)
+
     appointment_date: str = ""
+
     appointment_time: str = ""
-    reason: str = ""
+
     completed: bool = False
+
     waiting_for: str = ""
 
     def is_complete(self) -> bool:
         """
-        Check if all required fields are populated.
-        
-        Returns:
-            True if all required fields have values
+        Check whether all required booking information is available.
         """
+
         return all([
             self.patient_id is not None,
+            self.symptoms,
             self.doctor_name,
             self.appointment_date,
-            self.appointment_time,
-            self.reason
+            self.appointment_time
         ])
 
-    def reset(self) -> None:
+    def reset(self):
         """
-        Reset the state to initial values.
+        Reset conversation state.
         """
+
         self.intent = ""
         self.patient_id = None
+        self.symptoms = ""
+        self.department = ""
         self.doctor_name = ""
+        self.recommended_department = ""
+        self.doctor_list = []
         self.appointment_date = ""
         self.appointment_time = ""
-        self.reason = ""
         self.completed = False
         self.waiting_for = ""
 
-    def to_dict(self) -> dict:
+    def to_dict(self):
         """
-        Convert state to dictionary for serialization.
-        
-        Returns:
-            Dictionary representation of the state
+        Convert state to dictionary.
         """
+
         return {
             "intent": self.intent,
             "patient_id": self.patient_id,
+            "symptoms": self.symptoms,
+            "department": self.department,
             "doctor_name": self.doctor_name,
+            "recommended_department": self.recommended_department,
+            "doctor_list": self.doctor_list,
             "appointment_date": self.appointment_date,
             "appointment_time": self.appointment_time,
-            "reason": self.reason,
             "completed": self.completed,
             "waiting_for": self.waiting_for
         }

@@ -2,6 +2,8 @@ from models import db
 from models.doctor import Doctor
 from models.user import User
 from flask_bcrypt import Bcrypt
+from models.doctor import Doctor
+from models.user import User
 
 bcrypt = Bcrypt()
 
@@ -210,3 +212,36 @@ def delete_doctor(doctor_id):
     db.session.commit()
 
     return None
+
+
+
+
+def get_doctors_by_department(department):
+    """
+    Return all active doctors for a department.
+    """
+
+    doctors = (
+        Doctor.query
+        .filter_by(
+            department=department,
+            status=True
+        )
+        .all()
+    )
+
+    result = []
+
+    for doctor in doctors:
+        user = User.query.get(doctor.user_id)
+
+        result.append({
+            "id": doctor.id,
+            "full_name": user.full_name,
+            "department": doctor.department,
+            "specialization": doctor.specialization,
+            "available_days": doctor.available_days,
+            "available_time": doctor.available_time
+        })
+
+    return result

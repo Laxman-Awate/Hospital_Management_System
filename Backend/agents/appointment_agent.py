@@ -90,13 +90,19 @@ class AppointmentAgent:
             if field == "patient_id":
                 self.state.patient_id = int(user_message)
             elif field == "doctor_name":
-                self.state.doctor_name = user_message
+                        if user_message not in self.state.doctor_list:
+                            return (
+                                "Please choose one of the recommended doctors:\n\n"
+                                + "\n".join(self.state.doctor_list)
+                            )
+
+                        self.state.doctor_name = user_message
             elif field == "appointment_date":
                 self.state.appointment_date = user_message
             elif field == "appointment_time":
                 self.state.appointment_time = user_message
-            elif field == "reason":
-                self.state.reason = user_message
+            elif field == "symptoms":
+                self.state.symptoms = user_message
             else:
                 # Unknown field - reset
                 self.state.waiting_for = ""
@@ -113,10 +119,8 @@ class AppointmentAgent:
     def _update_state_from_extraction(self, data: dict) -> None:
         """
         Update agent state from extracted information.
-        
-        Args:
-            data: Dictionary containing extracted fields
         """
+
         if data.get("intent"):
             self.state.intent = data["intent"]
 
@@ -132,42 +136,77 @@ class AppointmentAgent:
         if data.get("appointment_time"):
             self.state.appointment_time = data["appointment_time"]
 
-        if data.get("reason"):
-            self.state.reason = data["reason"]
+        if data.get("symptoms"):
+            self.state.symptoms = data["symptoms"]
 
     def _determine_next_step(self) -> str:
         """
         Determine the next question or action based on current state.
-        
-        Returns:
-            Agent's response message
         """
-        # Check reason first - it's the starting point
-        if not self.state.reason:
-            self.state.waiting_for = "reason"
-            return "What is the reason for your appointment?"
 
-        # Check patient ID
+        # Ask symptoms first
+        if not self.state.symptoms:
+            self.state.waiting_for = "symptoms"
+            return "Please describe your symptoms."
+
+        # Recommend doctors based on symptoms
+        if not self.state.doctor_name:
+
+            result = self._tools.get_available_doctors(
+                self.state.symptoms
+            )
+
+            # No doctors found
+            if not result["success"]:
+                self.state.waiting_for = "symptoms"
+                return result["message"]
+
+            # Save recommended department
+            self.state.department = result["department"]
+            self.state.recommended_department = result["department"]
+
+            doctors = result["doctors"]
+
+            # Save doctor names for validation
+            self.state.doctor_list = [
+                doctor["full_name"] for doctor in doctors
+            ]
+
+            message = (
+                f"🏥 Recommended Department: {result['department']}\n\n"
+            )
+
+            message += "Available Doctors:\n\n"
+
+            for index, doctor in enumerate(doctors, start=1):
+                message += (
+                    f"{index}. {doctor['full_name']}\n"
+                    f"   Specialization: {doctor['specialization']}\n"
+                    f"   Available: {doctor['available_days']} | {doctor['available_time']}\n\n"
+                )
+
+            message += "Please enter the doctor's name."
+
+            self.state.waiting_for = "doctor_name"
+
+            return message
+
+        # Ask patient ID
         if self.state.patient_id is None:
             self.state.waiting_for = "patient_id"
             return "Please provide your Patient ID."
 
-        # Check doctor name
-        if not self.state.doctor_name:
-            self.state.waiting_for = "doctor_name"
-            return "Which doctor would you like to consult?"
-
-        # Check appointment date
+        # Ask appointment date
         if not self.state.appointment_date:
             self.state.waiting_for = "appointment_date"
-            return "What appointment date would you prefer? (e.g., today, tomorrow, or YYYY-MM-DD)"
+            return "Please enter appointment date (e.g. today, tomorrow or YYYY-MM-DD)."
 
-        # Check appointment time
+        # Ask appointment time
         if not self.state.appointment_time:
             self.state.waiting_for = "appointment_time"
-            return "What appointment time would you prefer? (e.g., 10:30 AM or 14:00)"
+            return "Please enter appointment time (e.g. 10:30 AM)."
 
-        # All fields collected - book the appointment
+        # Book appointment
         return self._book_appointment()
 
     def _book_appointment(self) -> str:
@@ -183,12 +222,12 @@ class AppointmentAgent:
                 doctor_name=self.state.doctor_name,
                 appointment_date=self.state.appointment_date,
                 appointment_time=self.state.appointment_time,
-                reason=self.state.reason
+                reason=self.state.symptoms
             )
 
             # Reset state after booking attempt
             self.state = AppointmentState()
-
+            self.state.completed = True
             return result
 
         except Exception as e:

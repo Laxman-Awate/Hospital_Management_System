@@ -37,7 +37,7 @@ function AdminDashboard() {
   const [prescriptions, setPrescriptions] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  
     const loadDashboard = async () => {
       try {
         const [summaryRes, revenueRes, appointmentsRes, growthRes, recentRes, notificationsRes, prescriptionsRes] = await Promise.all([
@@ -57,6 +57,7 @@ function AdminDashboard() {
         setLoading(false);
       }
     };
+    useEffect(() => {
     loadDashboard();
   }, []);
 

@@ -50,7 +50,7 @@ def extract_information(user_message: str) -> Dict[str, Any]:
             "doctor_name": "",
             "appointment_date": "",
             "appointment_time": "",
-            "reason": ""
+            "symptoms": ""
         }
 
     # ---------- Time ----------
@@ -64,7 +64,7 @@ def extract_information(user_message: str) -> Dict[str, Any]:
             "doctor_name": "",
             "appointment_date": "",
             "appointment_time": text,
-            "reason": ""
+            "symptoms": ""
         }
 
     # ---------- Date ----------
@@ -78,7 +78,7 @@ def extract_information(user_message: str) -> Dict[str, Any]:
             "doctor_name": "",
             "appointment_date": text,
             "appointment_time": "",
-            "reason": ""
+            "symptoms": ""
         }
 
     # ---------- Doctor ----------
@@ -90,7 +90,7 @@ def extract_information(user_message: str) -> Dict[str, Any]:
             "doctor_name": text,
             "appointment_date": "",
             "appointment_time": "",
-            "reason": ""
+            "symptoms": ""
         }
 
     # ---------- Complex Request ----------
@@ -118,24 +118,28 @@ def _extract_with_llm(text: str) -> Dict[str, Any]:
 You are an appointment information extractor.
 
 Extract the following fields from the user's message:
-- intent: What the user wants to do (book, cancel, reschedule, check)
-- patient_id: Patient ID number if mentioned
-- doctor_name: Doctor's name if mentioned
-- appointment_date: Date for appointment if mentioned
-- appointment_time: Time for appointment if mentioned
-- reason: Reason for appointment if mentioned
 
-Return ONLY valid JSON. Use null for missing values.
+- intent
+- patient_id
+- symptoms
+- doctor_name
+- appointment_date
+- appointment_time
 
-Example output:
+Return ONLY valid JSON.
+
+Example:
+
 {{
-    "intent": "book",
-    "patient_id": null,
-    "doctor_name": "Dr. Smith",
-    "appointment_date": "tomorrow",
-    "appointment_time": "10:30 AM",
-    "reason": "chest pain"
+    "intent":"book",
+    "patient_id":null,
+    "symptoms":"chest pain",
+    "doctor_name":"",
+    "appointment_date":"tomorrow",
+    "appointment_time":"10:30 AM"
 }}
+
+
 
 User message:
 {text}
