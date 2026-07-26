@@ -44,3 +44,9 @@ def update_doctor(doctor_id):
 @jwt_required()
 def delete_doctor(doctor_id):
     return DoctorController.delete_doctor(doctor_id)
+
+
+@doctor_bp.route("/by-user/<int:user_id>", methods=["GET"])
+@jwt_required()
+def get_doctor_by_user_id(user_id):
+    return DoctorController.get_doctor_by_user_id(user_id)

@@ -161,3 +161,19 @@ def delete_patient(patient_id):
     db.session.commit()
 
     return None
+def get_patient_by_user_id(user_id):
+    patient = Patient.query.filter_by(user_id=int(user_id)).first()
+
+    if not patient:
+        return None
+
+    return {
+        "id": patient.id,
+        "user_id": patient.user_id,
+        "full_name": patient.user.full_name,
+        "email": patient.user.email,
+        "age": patient.age,
+        "gender": patient.gender,
+        "phone": patient.phone,
+        "blood_group": patient.blood_group
+    }

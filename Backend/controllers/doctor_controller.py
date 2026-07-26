@@ -3,6 +3,7 @@ import services.doctor_service as doctor_service
 
 from utils.response import success_response, error_response
 from utils.role_required import role_required
+from flask_jwt_extended import jwt_required
 
 
 class DoctorController:
@@ -58,6 +59,7 @@ class DoctorController:
         )
 
     @staticmethod
+    @role_required(["Admin", "Doctor", "Patient"])
     def get_doctors():
         from flask_jwt_extended import get_jwt
         role = get_jwt().get("role") if get_jwt() else "Admin"
@@ -125,4 +127,17 @@ class DoctorController:
 
         return success_response(
             "Doctor deleted successfully"
+        )
+
+    @staticmethod
+    @jwt_required()
+    def get_doctor_by_user_id(user_id):
+        doctor = doctor_service.get_doctor_by_user_id(user_id)
+
+        if not doctor:
+            return error_response("Doctor profile not found", 404)
+
+        return success_response(
+            "Doctor profile fetched successfully",
+            doctor
         )

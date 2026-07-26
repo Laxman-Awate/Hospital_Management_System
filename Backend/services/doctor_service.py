@@ -245,3 +245,19 @@ def get_doctors_by_department(department):
         })
 
     return result
+
+
+def get_doctor_by_user_id(user_id):
+    doctor = Doctor.query.filter_by(user_id=int(user_id)).first()
+
+    if not doctor:
+        return None
+
+    return {
+        "id": doctor.id,
+        "user_id": doctor.user_id,
+        "full_name": doctor.user.full_name,
+        "email": doctor.user.email,
+        "specialization": doctor.specialization
+    }
+

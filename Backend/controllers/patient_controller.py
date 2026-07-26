@@ -4,10 +4,12 @@ from services.patient_service import (
     get_all_patients,
     get_patient_by_id,
     update_patient,
-    delete_patient
+    delete_patient,
+    get_patient_by_user_id as get_patient_by_user_id_service
 )
 from utils.response import success_response, error_response
 from utils.role_required import role_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 
 @role_required("Admin")
@@ -106,3 +108,16 @@ def remove_patient(patient_id):
         return error_response(error, 404)
 
     return success_response("Patient deleted successfully")
+
+
+@jwt_required()
+def get_patient_by_user_id(user_id):
+    patient = get_patient_by_user_id_service(user_id)
+
+    if not patient:
+        return error_response("Patient profile not found", 404)
+
+    return success_response(
+        "Patient profile fetched successfully",
+        patient
+    )
