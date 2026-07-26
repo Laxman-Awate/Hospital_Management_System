@@ -19,8 +19,8 @@ function Appointments() {
   const fetchAppointments = async () => {
     try {
       setLoading(true);
-      const response = await getAppointments();
-      setAppointments(response.data || []);
+     const response = await getAppointments();
+     setAppointments(response.data || []);
     } catch (error) {
       console.error(error);
       toast.error("Failed to load appointments.");

@@ -24,23 +24,20 @@ class AppointmentAgent:
     
     Session-based architecture ensures multi-user safety via AgentFactory.
     """
-
     def __init__(
         self,
         session_id: Optional[str] = None,
+        role: str = "Patient",
         state: Optional[AppointmentState] = None,
         tools: Optional[AppointmentTools] = None
     ):
         """
-        Initialize the appointment agent with dependency injection.
-        
-        Args:
-            session_id: Optional session identifier for multi-user support
-            state: Optional AppointmentState instance (for testing)
-            tools: Optional AppointmentTools instance (for testing)
+        Initialize the appointment agent.
         """
+
         self.state = state or AppointmentState()
         self.session_id = session_id
+        self.role = role
         self._tools = tools or AppointmentTools()
 
     def chat(self, user_message: str) -> str:
@@ -55,6 +52,20 @@ class AppointmentAgent:
         Returns:
             Agent's response message
         """
+        # Role-based AI behaviour
+        if self.role == "Doctor":
+            return (
+                "👨‍⚕️ Doctor Assistant\n\n"
+                "I am currently focused on helping patients with appointment booking.\n"
+                "Doctor-specific AI features will be added in a future update."
+            )
+
+        if self.role == "Admin":
+            return (
+                "👨‍💼 Admin Assistant\n\n"
+                "I am currently focused on helping patients with appointment booking.\n"
+                "Admin-specific AI features will be added in a future update."
+            )
         if not user_message or not user_message.strip():
             return "Please provide a valid message."
 

@@ -15,7 +15,8 @@ function PatientDashboard() {
     paidBills: 0,
     pendingBills: 0,
     totalAmount: 0,
-  });
+    patientId: null,
+   });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -29,8 +30,13 @@ function PatientDashboard() {
           getBills(),
         ]);
 
-        const appointments = appointmentsRes.data || [];
-        const bills = billsRes.data || [];
+       const appointments = appointmentsRes.data || [];
+       const bills = billsRes.data || [];
+       const patientId =
+         appointments.length > 0 ? appointments[0].patient_id : null;
+
+        console.log("User:", user);
+        console.log("Appointments:", appointments);
 
         const patientAppointments = appointments.filter(a => a.patient_id === user?.id);
         const patientBills = bills.filter(b => b.patient_id === user?.id);
@@ -39,7 +45,7 @@ function PatientDashboard() {
         const paidBills = patientBills.filter(b => b.payment_status === "Paid").length;
         const pendingBills = patientBills.filter(b => b.payment_status === "Pending").length;
 
-        setStats({
+       setStats({
           appointments: patientAppointments.length,
           scheduledAppointments: patientAppointments.filter(a => a.status === "Scheduled").length,
           completedAppointments: patientAppointments.filter(a => a.status === "Completed").length,
@@ -47,6 +53,7 @@ function PatientDashboard() {
           paidBills,
           pendingBills,
           totalAmount,
+          patientId,
         });
       } catch (error) {
         console.error(error);
@@ -123,11 +130,11 @@ function PatientDashboard() {
               color="blue"
             />
             <DashboardCard
-              title="Patient ID"
-              value={user?.id || "N/A"}
-              icon={UserCircle}
-              color="gray"
-            />
+                  title="Patient ID"
+                  value={stats.patientId || "N/A"}
+                  icon={UserCircle}
+                  color="gray"
+              />
           </div>
         </>
       )}
