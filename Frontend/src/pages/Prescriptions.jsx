@@ -125,7 +125,7 @@ function Prescriptions() {
       {loading ? (
         <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" /></div>
       ) : (
-        <Table columns={columns} data={current} keyField="id" emptyMessage="No prescriptions found." />
+        <Table columns={columns} data={current} keyField="id" emptyMessage={user?.role === "Patient" ? "No prescriptions available." : "No prescriptions found."} />
       )}
 
       {totalPages > 1 && (

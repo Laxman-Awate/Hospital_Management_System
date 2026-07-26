@@ -5,9 +5,12 @@ import AddEditBillModal from "../components/AddEditBillModal";
 import { toast } from "react-toastify";
 import Table from "../components/Table";
 import StatusBadge from "../components/StatusBadge";
+import { useAuth } from "../context/AuthContext";
 import { DollarSign, CheckSquare, Clock, Receipt, Search, Plus, Edit2, Trash2 } from "lucide-react";
 
 function Billing() {
+  const { user } = useAuth();
+  const isAdmin = user?.role === "Admin";
   const [bills, setBills] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -68,12 +71,12 @@ function Billing() {
 
   const columns = [
     { header: "Invoice #", render: (row) => <span className="font-mono text-sm font-semibold text-slate-700">{row.invoice_number}</span> },
-    { header: "Patient", accessor: "patient_name" },
+    ...(isAdmin ? [{ header: "Patient", accessor: "patient_name" }] : []),
     { header: "Date", render: (row) => row.payment_date || "—" },
     { header: "Amount", render: (row) => <span className="font-semibold text-slate-800">{fmt(row.total_amount)}</span> },
     { header: "Method", accessor: "payment_method" },
     { header: "Status", render: (row) => <StatusBadge status={row.payment_status} /> },
-    { header: "Actions", render: (row) => (
+    ...(isAdmin ? [{ header: "Actions", render: (row) => (
       <div className="flex gap-2">
         <button
           onClick={async () => {
@@ -96,22 +99,24 @@ function Billing() {
           <Trash2 className="w-4 h-4" />
         </button>
       </div>
-    )},
+    )}] : []),
   ];
 
   return (
     <MainLayout>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800">Billing</h1>
-          <p className="text-slate-500 text-sm mt-1">Manage invoices and payments</p>
+          <h1 className="text-3xl font-bold text-slate-800">{isAdmin ? "Billing" : "My Bills"}</h1>
+          <p className="text-slate-500 text-sm mt-1">{isAdmin ? "Manage invoices and payments" : "View your billing summary"}</p>
         </div>
-        <button
-          onClick={() => { setSelectedBill(null); setIsModalOpen(true); }}
-          className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-medium transition-colors shadow-sm shadow-blue-200"
-        >
-          <Plus className="w-5 h-5 mr-2" /> Generate Bill
-        </button>
+        {isAdmin && (
+          <button
+            onClick={() => { setSelectedBill(null); setIsModalOpen(true); }}
+            className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-medium transition-colors shadow-sm shadow-blue-200"
+          >
+            <Plus className="w-5 h-5 mr-2" /> Generate Bill
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -137,7 +142,7 @@ function Billing() {
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
         <input
           type="text"
-          placeholder="Search by invoice, patient, status..."
+          placeholder={isAdmin ? "Search by invoice, patient, status..." : "Search by invoice, status, method..."}
           value={search}
           onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
           className="pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl w-full md:w-96 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm transition-colors"
@@ -160,7 +165,7 @@ function Billing() {
         </div>
       )}
 
-      <AddEditBillModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSuccess={fetchBills} bill={selectedBill} />
+      {isAdmin && <AddEditBillModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSuccess={fetchBills} bill={selectedBill} />}
     </MainLayout>
   );
 }
