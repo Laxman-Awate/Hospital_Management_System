@@ -5,6 +5,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
 from models import db
 from models.user import User
+from services.patient_service import create_patient
 
 bcrypt = Bcrypt()
 
@@ -41,15 +42,41 @@ def register():
 
     hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
 
-    new_user = User(
-        full_name=full_name,
-        email=email,
-        password=hashed_password,
-        role=role
-    )
+    try:
+        new_user = User(
+            full_name=full_name,
+            email=email,
+            password=hashed_password,
+            role=role
+        )
 
-    db.session.add(new_user)
-    db.session.commit()
+        db.session.add(new_user)
+        db.session.commit()
+        print("Registered user id:", new_user.id)
+
+        patient_created = False
+        if role == "Patient":
+            patient, error = create_patient({
+                "user_id": new_user.id,
+                "age": 0,
+                "gender": "Male",
+                "phone": "0000000000"
+            })
+            if error:
+                print("Registration rollback:", error)
+                return jsonify({
+                    "message": error
+                }), 500
+            patient_created = True
+            print("Patient row created:", patient_created, "patient_id:", patient.id, "patient.user_id:", patient.user_id)
+        else:
+            print("Patient row created:", patient_created)
+    except Exception as error:
+        db.session.rollback()
+        print("Registration rollback:", str(error))
+        return jsonify({
+            "message": "Unable to register user"
+        }), 500
 
     return jsonify({
         "message": "User registered successfully"

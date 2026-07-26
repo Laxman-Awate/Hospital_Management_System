@@ -4,6 +4,7 @@ from models import db
 from models.notification import Notification
 from models.patient import Patient
 from models.user import User
+from notifications.email import EmailService
 
 
 class NotificationService:
@@ -143,8 +144,17 @@ class NotificationService:
 
     @staticmethod
     def send_notification(notification_id):
-        """Compatibility no-op for the existing scheduler's in-app notifications."""
+        """Send the existing notification via email when the target user has an email address."""
         notification = Notification.query.get(notification_id)
         if not notification:
             return None, "Notification not found"
+
+        user = notification.user
+        if not user or not user.email:
+            return None, "User email not found"
+
+        sent = EmailService.send_email(user.email, notification.title, notification.message)
+        if not sent:
+            return None, "Unable to send notification"
+
         return notification, None

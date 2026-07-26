@@ -10,6 +10,7 @@ from models.appointment import Appointment
 from models.patient import Patient
 from models.doctor import Doctor
 from models.user import User
+from services.notification_service import NotificationService
 
 
 def create_appointment(data):
@@ -45,6 +46,16 @@ def create_appointment(data):
 
     db.session.add(appointment)
     db.session.commit()
+
+    NotificationService.create_notification({
+        "patient_id": patient.id,
+        "title": "Appointment Booked",
+        "message": (
+            f"Your appointment with Dr. {doctor.user.full_name} "
+            f"has been booked for {appointment.appointment_date} at {appointment.appointment_time}."
+        ),
+        "notification_type": "Appointment Booked"
+    })
 
     return appointment, None
 
@@ -173,8 +184,23 @@ def delete_appointment(appointment_id, role, user_id):
         if not patient or appointment.patient_id != patient.id:
             return "Access denied"
 
+    patient_id = appointment.patient_id
+    doctor_name = appointment.doctor.user.full_name if appointment.doctor and appointment.doctor.user else "Doctor"
+    appointment_date = appointment.appointment_date
+    appointment_time = appointment.appointment_time
+
     db.session.delete(appointment)
     db.session.commit()
+
+    NotificationService.create_notification({
+        "patient_id": patient_id,
+        "title": "Appointment Cancelled",
+        "message": (
+            f"Your appointment with Dr. {doctor_name} "
+            f"scheduled for {appointment_date} at {appointment_time} has been cancelled."
+        ),
+        "notification_type": "Appointment Cancelled"
+    })
 
     return None
 

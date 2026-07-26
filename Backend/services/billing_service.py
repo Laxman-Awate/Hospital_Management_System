@@ -2,6 +2,7 @@ import random
 from models import db
 from models.bill import Bill
 from models.appointment import Appointment
+from services.notification_service import NotificationService
 
 
 class BillingService:
@@ -53,6 +54,16 @@ class BillingService:
 
         db.session.add(bill)
         db.session.commit()
+
+        NotificationService.create_notification({
+            "patient_id": appointment.patient_id,
+            "title": "Bill Generated",
+            "message": (
+                f"A bill ({bill.invoice_number}) of amount {bill.total_amount} "
+                f"has been generated for your appointment."
+            ),
+            "notification_type": "Bill Generated"
+        })
 
         return bill, None
 

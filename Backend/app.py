@@ -10,7 +10,7 @@ from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
 
 from config import Config
-from extensions import db, bcrypt, jwt
+from extensions import db, bcrypt, jwt, mail
 from models import db as models_db
 
 # Route imports
@@ -38,6 +38,7 @@ CORS(app, resources={r"/api/*": {"origins": "*"}})
 jwt = JWTManager(app)
 bcrypt = Bcrypt(app)
 db.init_app(app)
+mail.init_app(app)
 
 # Register blueprints
 app.register_blueprint(admin_bp, url_prefix="/api/admin")

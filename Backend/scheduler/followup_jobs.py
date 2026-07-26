@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+from models import db
 from models.appointment import Appointment
 from services.notification_service import NotificationService
 
@@ -13,7 +14,8 @@ def send_followup_reminders():
 
     appointments = Appointment.query.filter(
         Appointment.appointment_date == yesterday,
-        Appointment.status == "Completed"
+        Appointment.status == "Completed",
+        Appointment.followup_sent == False
     ).all()
 
     for appointment in appointments:
@@ -24,7 +26,7 @@ def send_followup_reminders():
                 "We hope you're feeling better. "
                 "Please schedule a follow-up visit if needed."
             ),
-            "notification_type": "Email"
+            "notification_type": "Follow-up Reminder"
         }
 
         notification, error = NotificationService.create_notification(
@@ -33,5 +35,7 @@ def send_followup_reminders():
 
         if notification:
             NotificationService.send_notification(notification.id)
+            appointment.followup_sent = True
+            db.session.commit()
 
     print("Follow-up reminder job completed.")

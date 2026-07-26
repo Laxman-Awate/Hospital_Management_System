@@ -2,9 +2,6 @@ from flask_mail import Message
 from extensions import mail
 
 
-from notifications.mail_config import mail
-
-
 class EmailService:
 
     @staticmethod

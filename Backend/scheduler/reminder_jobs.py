@@ -33,7 +33,7 @@ def send_appointment_reminders():
                 f"Thank you,\n"
                 f"Hospital Management System"
             ),
-            "notification_type": "Email"
+            "notification_type": "Appointment Reminder"
         }
 
         notification, error = NotificationService.create_notification(

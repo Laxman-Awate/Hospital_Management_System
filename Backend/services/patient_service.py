@@ -162,7 +162,9 @@ def delete_patient(patient_id):
 
     return None
 def get_patient_by_user_id(user_id):
+    print("Query executed in by-user endpoint for user_id:", user_id)
     patient = Patient.query.filter_by(user_id=int(user_id)).first()
+    print("Query result:", patient)
 
     if not patient:
         return None
