@@ -61,7 +61,15 @@ dist/
 Thumbs.db
 
 # ===============================
-# Temporary Files
+# Temporary & Audio Files
 # ===============================
 *.tmp
 *.temp
+uploads/
+temp_audio/
+*.webm
+*.wav
+*.mp3
+*.ogg
+*.oga
+*.m4a

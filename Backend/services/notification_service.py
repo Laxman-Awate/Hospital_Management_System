@@ -11,7 +11,7 @@ class NotificationService:
     VALID_TYPES = {
         "Appointment Booked", "Appointment Cancelled", "Appointment Reminder",
         "Prescription Created", "Bill Generated", "Follow-up Reminder",
-        "General Notification",
+        "Medical Record Updated", "General Notification",
     }
 
     @staticmethod

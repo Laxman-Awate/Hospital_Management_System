@@ -12,10 +12,9 @@ import Patients from "./pages/Patients";
 import Doctors from "./pages/Doctors";
 import Appointments from "./pages/Appointments";
 import Billing from "./pages/Billing";
-import AppointmentAssistant from "./pages/AppointmentAssistant";
 import Prescriptions from "./pages/Prescriptions";
 import Notifications from "./pages/Notifications";
-
+import MedicalRecords from "./pages/MedicalRecords";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -58,9 +57,8 @@ function App() {
       <Route path="/appointments" element={<ProtectedRoute allowedRoles={["Admin", "Doctor", "Patient"]}><Appointments /></ProtectedRoute>} />
       <Route path="/billing" element={<ProtectedRoute allowedRoles={["Admin", "Patient"]}><Billing /></ProtectedRoute>} />
       <Route path="/prescriptions" element={<ProtectedRoute allowedRoles={["Admin", "Doctor", "Patient"]}><Prescriptions /></ProtectedRoute>} />
+      <Route path="/medical-records" element={<ProtectedRoute allowedRoles={["Admin", "Doctor", "Patient"]}><MedicalRecords /></ProtectedRoute>} />
       <Route path="/notifications" element={<ProtectedRoute allowedRoles={["Admin", "Doctor", "Patient"]}><Notifications /></ProtectedRoute>} />
-
-      <Route path="/assistant" element={<ProtectedRoute allowedRoles={["Admin", "Doctor", "Patient"]}><AppointmentAssistant /></ProtectedRoute>} />
     </Routes>
   );
 }

@@ -22,9 +22,10 @@ from routes.appointment_routes import appointment_bp
 from routes.dashboard_routes import dashboard_bp
 from routes.billing_routes import billing_bp
 from routes.notification_routes import notification_bp
-from routes.agent_routes import agent_bp
 from routes.prescription_routes import prescription_bp
 from routes.ai_routes import ai_bp
+from routes.consultation_routes import consultation_bp
+from routes.medical_record_routes import medical_record_bp
 
 from scheduler.scheduler import start_scheduler
 
@@ -49,9 +50,10 @@ app.register_blueprint(appointment_bp)
 app.register_blueprint(dashboard_bp)
 app.register_blueprint(billing_bp)
 app.register_blueprint(notification_bp)
-app.register_blueprint(agent_bp)
 app.register_blueprint(prescription_bp)
 app.register_blueprint(ai_bp)
+app.register_blueprint(consultation_bp)
+app.register_blueprint(medical_record_bp)
 
 # Create database tables
 with app.app_context():

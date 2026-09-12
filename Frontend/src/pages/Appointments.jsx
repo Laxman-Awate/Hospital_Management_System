@@ -2,12 +2,15 @@ import { useEffect, useMemo, useState } from "react";
 import MainLayout from "../layouts/MainLayout";
 import { getAppointments, getAppointmentById, deleteAppointment } from "../services/appointmentService";
 import AddEditAppointmentModal from "../components/AddEditAppointmentModal";
+import DoctorConsultationModal from "../components/DoctorConsultationModal";
 import { toast } from "react-toastify";
 import Table from "../components/Table";
 import StatusBadge from "../components/StatusBadge";
-import { Calendar, Clock, CheckCircle, XCircle, Search, Plus, Edit2, Trash2 } from "lucide-react";
+import { Calendar, Clock, CheckCircle, XCircle, Search, Plus, Edit2, Trash2, Stethoscope } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
 function Appointments() {
+  const { user } = useAuth();
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -15,6 +18,9 @@ function Appointments() {
   const appointmentsPerPage = 8;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
+  
+  const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
+  const [consultationAppointment, setConsultationAppointment] = useState(null);
 
   const fetchAppointments = async () => {
     try {
@@ -69,6 +75,18 @@ function Appointments() {
     { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
     { header: "Actions", render: (row) => (
       <div className="flex gap-2">
+        {user?.role === "Doctor" && (
+          <button
+            onClick={() => {
+              setConsultationAppointment(row);
+              setIsConsultationModalOpen(true);
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-colors"
+            title="Start Consultation"
+          >
+            <Stethoscope className="w-3.5 h-3.5" /> Consultation
+          </button>
+        )}
         <button
           onClick={async () => {
             try {
@@ -155,6 +173,18 @@ function Appointments() {
       )}
 
       <AddEditAppointmentModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSuccess={fetchAppointments} appointment={selectedAppointment} />
+      
+      {consultationAppointment && (
+        <DoctorConsultationModal
+          isOpen={isConsultationModalOpen}
+          onClose={() => {
+            setIsConsultationModalOpen(false);
+            setConsultationAppointment(null);
+          }}
+          appointment={consultationAppointment}
+          onSuccess={fetchAppointments}
+        />
+      )}
     </MainLayout>
   );
 }

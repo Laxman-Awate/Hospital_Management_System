@@ -6,6 +6,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from models import db
 from models.user import User
 from services.patient_service import create_patient
+from models.doctor import Doctor
 
 bcrypt = Bcrypt()
 
@@ -69,6 +70,22 @@ def register():
                 }), 500
             patient_created = True
             print("Patient row created:", patient_created, "patient_id:", patient.id, "patient.user_id:", patient.user_id)
+        elif role == "Doctor":
+            # Self-registered doctors need a profile row as well as a user row;
+            # otherwise appointment/profile endpoints cannot resolve the JWT user.
+            doctor = Doctor(
+                user_id=new_user.id,
+                specialization="General Medicine",
+                qualification="Not specified",
+                experience=0,
+                consultation_fee=0,
+                phone="0000000000",
+                department="General Medicine",
+                status=True,
+            )
+            db.session.add(doctor)
+            db.session.commit()
+            print("Doctor row created:", doctor.id, "doctor.user_id:", doctor.user_id)
         else:
             print("Patient row created:", patient_created)
     except Exception as error:

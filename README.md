@@ -1,12 +1,6 @@
 # 🏥 Hospital Management System
 
-![React](https://img.shields.io/badge/Frontend-React-61DAFB?logo=react&logoColor=white)
-![Vite](https://img.shields.io/badge/Build-Vite-646CFF?logo=vite&logoColor=white)
-![Flask](https://img.shields.io/badge/Backend-Flask-000000?logo=flask&logoColor=white)
-![Python](https://img.shields.io/badge/Language-Python-3776AB?logo=python&logoColor=white)
-![MySQL](https://img.shields.io/badge/Database-MySQL-4479A1?logo=mysql&logoColor=white)
-![JWT](https://img.shields.io/badge/Auth-JWT-000000?logo=jsonwebtokens&logoColor=white)
-![Gemini](https://img.shields.io/badge/AI-Google%20Gemini-4285F4?logo=google&logoColor=white)
+
 
 A full-stack **Hospital Management System** built to streamline hospital operations through **role-based access control**, **appointment management**, **billing**, **notifications**, and an **AI-powered appointment assistant**. The project is designed to provide separate workflows for **Admin**, **Patient**, and **Doctor** users while keeping the overall hospital process efficient and organized.
 
@@ -52,7 +46,7 @@ A full-stack **Hospital Management System** built to streamline hospital operati
 - Billing notifications
 - Scheduled reminder support is present in the backend
 
-> Note: Some modules such as prescriptions and advanced reminder/email workflows are present in the codebase but may be partially implemented depending on your local setup and data.
+> 
 
 ---
 
@@ -192,9 +186,11 @@ MAIL_USERNAME=your_email@example.com
 MAIL_PASSWORD=your_mail_password
 
 GEMINI_API_KEY=your_gemini_api_key
+OPENAI_API_KEY=your_openai_api_key
+WHISPER_MODEL=whisper-1
 ```
 
-> Depending on your local backend configuration, variable names in your project may slightly differ. Update them according to your `Backend/config.py` and `.env` setup.
+> .
 
 ---
 
@@ -210,7 +206,6 @@ GEMINI_API_KEY=your_gemini_api_key
 
 ## 📸 Screenshots
 
-> Add screenshots to a `screenshots/` folder in the repository and replace these placeholders if needed.
 
 ![Login](screenshots/login.png)
 ![Admin Dashboard](screenshots/admin-dashboard.png)
@@ -250,11 +245,7 @@ This project helped strengthen practical understanding of:
 
 ---
 
-## 👨‍💻 Author
 
-**Name:** Your Name  
-**GitHub:** [your-github-profile](https://github.com/your-github-profile)  
-**LinkedIn:** [your-linkedin-profile](https://linkedin.com/in/your-linkedin-profile)  
 
 ---
 

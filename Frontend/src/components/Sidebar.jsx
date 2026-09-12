@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { 
-  LayoutDashboard, Users, User, Calendar, Receipt, FileText, Bell, MessageSquare, Hospital
+  LayoutDashboard, Users, User, Calendar, Receipt, FileText, Bell, Hospital, ClipboardList
 } from "lucide-react";
 
 function Sidebar({ isOpen, setIsSidebarOpen }) {
@@ -17,24 +17,24 @@ function Sidebar({ isOpen, setIsSidebarOpen }) {
             { path: "/appointments", label: "Appointments", icon: Calendar },
             { path: "/billing", label: "Billing", icon: Receipt },
             { path: "/prescriptions", label: "Prescriptions", icon: FileText },
+            { path: "/medical-records", label: "Medical Records", icon: ClipboardList },
             { path: "/notifications", label: "Notifications", icon: Bell },
-            { path: "/assistant", label: "AI Assistant", icon: MessageSquare },
         ],
         Doctor: [
             { path: "/doctor", label: "Dashboard", icon: LayoutDashboard },
             { path: "/appointments", label: "Appointments", icon: Calendar },
             { path: "/patients", label: "My Patients", icon: Users },
             { path: "/prescriptions", label: "Prescriptions", icon: FileText },
+            { path: "/medical-records", label: "Medical Records", icon: ClipboardList },
             { path: "/notifications", label: "Notifications", icon: Bell },
-            { path: "/assistant", label: "AI Assistant", icon: MessageSquare },
         ],
         Patient: [
             { path: "/patient", label: "Dashboard", icon: LayoutDashboard },
             { path: "/appointments", label: "Appointments", icon: Calendar },
+            { path: "/medical-records", label: "My Medical Records", icon: ClipboardList },
             { path: "/prescriptions", label: "My Prescriptions", icon: FileText },
             { path: "/billing", label: "My Bills", icon: Receipt },
             { path: "/notifications", label: "Notifications", icon: Bell },
-            { path: "/assistant", label: "AI Assistant", icon: MessageSquare },
         ]
     };
 
