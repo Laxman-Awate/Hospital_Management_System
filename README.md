@@ -252,3 +252,17 @@ This project helped strengthen practical understanding of:
 ## 📄 License
 
 This project is licensed under the **MIT License**.
+
+## Demo Data
+
+Run from the `Backend` directory:
+
+```powershell
+python seed_demo_data.py
+```
+
+This idempotent script adds clearly marked demo users and related appointments, medical records, prescriptions, bills, and notifications without deleting existing non-demo data. All demo accounts use password `Demo@123`.
+
+- Admin: `admin@demo.medicare.local`
+- Doctors: `doctor1@demo.medicare.local` through `doctor4@demo.medicare.local`
+- Patients: `patient1@demo.medicare.local` through `patient10@demo.medicare.local`
