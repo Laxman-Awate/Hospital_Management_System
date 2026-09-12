@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -15,6 +15,7 @@ import Billing from "./pages/Billing";
 import Prescriptions from "./pages/Prescriptions";
 import Notifications from "./pages/Notifications";
 import MedicalRecords from "./pages/MedicalRecords";
+import Home from "./pages/Home";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -22,7 +23,7 @@ function App() {
   return (
     <Routes>
       {/* Public Routes */}
-      <Route path="/" element={<Navigate to="/login" />} />
+      <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/unauthorized" element={<AccessDenied />} />

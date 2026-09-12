@@ -4,6 +4,8 @@ Hospital Management System - Flask Application
 Main application entry point for the Hospital Management System backend.
 """
 
+import os
+
 from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
@@ -71,4 +73,12 @@ def home():
 
 if __name__ == "__main__":
     start_scheduler()
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    # The Windows watchdog reloader can restart the process while requests are
+    # in flight (and was resetting browser login requests). Keep debug errors
+    # enabled, but use a stable single process for local development.
+    app.run(
+        debug=os.getenv("FLASK_DEBUG", "true").lower() == "true",
+        use_reloader=False,
+        host="0.0.0.0",
+        port=5000,
+    )
